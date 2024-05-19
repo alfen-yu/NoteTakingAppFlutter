@@ -2,7 +2,7 @@
 // ignore_for_file: type=lint
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+    show defaultTargetPlatform, TargetPlatform;
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -16,18 +16,11 @@ import 'package:flutter/foundation.dart'
 /// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    if (kIsWeb) {
-      return web;
-    }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
         return ios;
-      case TargetPlatform.macOS:
-        return macos;
-      case TargetPlatform.windows:
-        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -40,14 +33,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAslTl4QHwxDkKBMBYkgpsiiLj405MLywI',
-    appId: '1:85797971993:web:2e6a2c17312e0c8a22e288',
-    messagingSenderId: '85797971993',
-    projectId: 'testdartbasics',
-    authDomain: 'testdartbasics.firebaseapp.com',
-    storageBucket: 'testdartbasics.appspot.com',
-  );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCem1oxo29jQMKlLh0CDmrZlLD_3kI-00A',
@@ -66,21 +51,4 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.example.dartbasics',
   );
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA0H_E9dthrsk_eb7yLl83EhJg3_k5szk4',
-    appId: '1:85797971993:ios:c68e6c0e984211d622e288',
-    messagingSenderId: '85797971993',
-    projectId: 'testdartbasics',
-    storageBucket: 'testdartbasics.appspot.com',
-    iosBundleId: 'com.example.dartbasics',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAslTl4QHwxDkKBMBYkgpsiiLj405MLywI',
-    appId: '1:85797971993:web:0519318d799811ad22e288',
-    messagingSenderId: '85797971993',
-    projectId: 'testdartbasics',
-    authDomain: 'testdartbasics.firebaseapp.com',
-    storageBucket: 'testdartbasics.appspot.com',
-  );
 }
