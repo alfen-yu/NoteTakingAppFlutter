@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// ignore_for_file: avoid_print
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
