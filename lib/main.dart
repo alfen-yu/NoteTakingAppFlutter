@@ -1,3 +1,4 @@
+import 'package:dartbasics/constants/routes.dart';
 import 'package:dartbasics/firebase_options.dart';
 import 'package:dartbasics/views/login_view.dart';
 import 'package:dartbasics/views/notes_view.dart';
@@ -24,9 +25,9 @@ void main() async {
     ),
     home: const HomePage(),
     routes: {
-      '/login': (context) => const LoginView(),
-      '/register': (context) => const RegisterView(),
-      '/notes': (context) => const NotesView(),
+      loginRoute: (context) => const LoginView(),
+      registerRoute: (context) => const RegisterView(),
+      notesRoute: (context) => const NotesView(),
     },
   ));
 }
