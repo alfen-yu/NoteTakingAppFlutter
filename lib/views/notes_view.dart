@@ -25,7 +25,6 @@ class _NotesViewState extends State<NotesView> {
             backgroundColor: const Color.fromARGB(255, 67, 196, 166),
             foregroundColor: const Color.fromARGB(255, 117, 32, 2),
             actions: [
-          ElevatedButton(onPressed: () {}, child: const Text('Logout')),
           PopupMenuButton<MenuAction>(onSelected: (value) async {
             switch (value) {
               case MenuAction.logout:
