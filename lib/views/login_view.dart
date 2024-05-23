@@ -30,7 +30,10 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login Screen'), backgroundColor: Colors.amberAccent, foregroundColor: Colors.white),
+      appBar: AppBar(
+          title: const Text('Login Screen'),
+          backgroundColor: Colors.amberAccent,
+          foregroundColor: Colors.white),
       body: Column(
         children: [
           TextField(
@@ -56,9 +59,15 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredentials = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: email, password: password);
-                devtools.log(userCredentials.toString());
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
+                if (!context.mounted) return;
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/notes',
+                  (route) => false,
+                );
               } on FirebaseAuthException catch (e) {
                 switch (e.code) {
                   case 'invalid-credential':
@@ -83,9 +92,12 @@ class _LoginViewState extends State<LoginView> {
             child: const Text('Login'),
           ),
           const Text('Not Registered Yet?'),
-          TextButton(onPressed: () {
-            Navigator.of(context).pushNamedAndRemoveUntil('/register', (route) => false);
-          }, child: const Text('Go to Register Screen')),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/register', (route) => false);
+              },
+              child: const Text('Go to Register Screen')),
         ],
       ),
     );
