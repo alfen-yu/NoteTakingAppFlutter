@@ -64,16 +64,28 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
-                if (!context.mounted) return;
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  notesRoute,
-                  (route) => false,
-                );
+                final user = FirebaseAuth.instance.currentUser;
+                if (user?.emailVerified == true) {
+                  if (!context.mounted) return;
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    notesRoute,
+                    (route) => false,
+                  );
+                } else {
+                  if(!context.mounted) return;
+                  await showErrorDialog(context, 'Please confirm your email first.');
+                  if(!context.mounted) return;
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    verifyEmail,
+                    (route) => false,
+                  );
+                }
               } on FirebaseAuthException catch (e) {
-                if(!context.mounted) return;
+                if (!context.mounted) return;
                 switch (e.code) {
                   case 'invalid-credential':
-                    await showErrorDialog(context, 'Invalid credentials, check again');
+                    await showErrorDialog(
+                        context, 'Invalid credentials, check again');
                     break;
                   case 'invalid-email':
                     await showErrorDialog(context, 'Email Address is invalid!');
@@ -88,7 +100,9 @@ class _LoginViewState extends State<LoginView> {
                     await showErrorDialog(context, 'Error: ${e.code}');
                 }
               } catch (e) {
-                await showErrorDialog(context, 'An unexpected error occurred: $e');
+                if (!context.mounted) return;
+                await showErrorDialog(
+                    context, 'An unexpected error occurred: $e');
               }
             },
             child: const Text('Login'),

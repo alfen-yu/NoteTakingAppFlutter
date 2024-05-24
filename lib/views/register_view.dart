@@ -63,10 +63,11 @@ class _RegisterViewState extends State<RegisterView> {
               try {
                 await FirebaseAuth.instance.createUserWithEmailAndPassword(
                     email: email, password: password);
+                final user = FirebaseAuth.instance.currentUser;
+                user?.sendEmailVerification();
                 if (!context.mounted) return;
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  loginRoute,
-                  (route) => false,
+                Navigator.of(context).pushNamed(
+                  verifyEmail,
                 );
               } on FirebaseAuthException catch (e) {
                 if (!context.mounted) return;
@@ -86,6 +87,9 @@ class _RegisterViewState extends State<RegisterView> {
                   default:
                     await showErrorDialog(context, 'Error: ${e.code}');
                 }
+              } catch (e) {
+                await showErrorDialog(
+                    context, 'An unexpected error occurred: $e');
               }
             },
             child: const Text('Register'),
