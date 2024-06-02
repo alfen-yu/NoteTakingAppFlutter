@@ -1,8 +1,0 @@
-Theory:
-
-1. There are three types of tests in flutter: unit tests, integration tests, widget tests. We need tests to verify if the software we designed is performing according to the
-expectations. 
-
- - Unit Test: Take AuthService and test on given conditions and test them 
- - Integration Test: 
- - Widget Test: 
