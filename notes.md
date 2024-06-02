@@ -1,4 +1,4 @@
-                                                                                        ## Theory:
+## Theory:
 
 1. There are three types of tests in flutter: unit tests, integration tests, widget tests. We need tests to verify if the software we designed is performing according to the
 expectations. 
@@ -12,7 +12,7 @@ TDD: Test Driven Development, tests need to be written before writing the code i
 
 2. Dev Development aren't package when the app is shipped and released, they are only in the development mode. 
 
-                                                                                        ##Practical: 
+## Practical: 
 
 1. If the UI gets stuck on a white screen or not running properly. 
     - flutter clean
