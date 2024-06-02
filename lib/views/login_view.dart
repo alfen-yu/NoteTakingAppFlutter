@@ -1,7 +1,8 @@
 import 'package:dartbasics/constants/routes.dart';
+import 'package:dartbasics/services/auth_exceptions.dart';
+import 'package:dartbasics/services/auth_service.dart';
 import 'package:dartbasics/utilities/errors.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -60,49 +61,38 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
-                  email: email,
-                  password: password,
-                );
-                final user = FirebaseAuth.instance.currentUser;
-                if (user?.emailVerified == true) {
+                await AuthService.firebase()
+                    .login(email: email, password: password);
+                final user = AuthService.firebase().currentUser;
+                if (user?.isEmailVerified == true) {
                   if (!context.mounted) return;
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     notesRoute,
                     (route) => false,
                   );
                 } else {
-                  if(!context.mounted) return;
-                  await showErrorDialog(context, 'Please confirm your email first.');
-                  if(!context.mounted) return;
+                  if (!context.mounted) return;
+                  await showErrorDialog(
+                      context, 'Please verify your email first.');
+                  if (!context.mounted) return;
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     verifyEmail,
                     (route) => false,
                   );
                 }
-              } on FirebaseAuthException catch (e) {
-                if (!context.mounted) return;
-                switch (e.code) {
-                  case 'invalid-credential':
-                    await showErrorDialog(
-                        context, 'Invalid credentials, check again');
-                    break;
-                  case 'invalid-email':
-                    await showErrorDialog(context, 'Email Address is invalid!');
-                    break;
-                  case 'user-not-found':
-                    await showErrorDialog(context, 'user does not exist');
-                    break;
-                  case 'wrong-password':
-                    await showErrorDialog(context, 'Wrong Password!');
-                    break;
-                  default:
-                    await showErrorDialog(context, 'Error: ${e.code}');
-                }
-              } catch (e) {
-                if (!context.mounted) return;
+              }
+              // using the auth services
+              on UserNotFoundAuthException {
+                await showErrorDialog(context, 'User does not exist.');
+              } on InvalidCredentialsAuthException {
                 await showErrorDialog(
-                    context, 'An unexpected error occurred: $e');
+                    context, 'Invalid credentials, check again');
+              } on InvalidEmailAuthException {
+                await showErrorDialog(context, 'Email Address is invalid!');
+              } on WrongPasswordAuthException {
+                await showErrorDialog(context, 'Wrong Password!');
+              } on GenericAuthException {
+                await showErrorDialog(context, 'An unexpected error occured.');
               }
             },
             child: const Text('Login'),

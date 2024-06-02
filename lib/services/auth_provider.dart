@@ -4,6 +4,7 @@ import 'package:dartbasics/services/auth_user.dart';
 // can also be implemented for other authentication services
 
 abstract class AuthProvider {
+  Future<void> initialize();
   AuthUser? get currentUser;
   Future<AuthUser> login({required String email, required String password});
   Future<AuthUser> createUser({required String email, required String password});
