@@ -8,9 +8,9 @@ import 'package:dartbasics/services/firebase_auth_provider.dart';
 
 class AuthService implements AuthProvider {
   final AuthProvider provider;
-  const AuthService(this.provider); // constructor
+  const AuthService(this.provider); // constructor that takes a provider, {dependency injection}
 
-  factory AuthService.firebase() => AuthService(FirebaseAuthProvider());
+  factory AuthService.firebase() => AuthService(FirebaseAuthProvider()); // gives the FirebaseAuthProvider to AuthService, which we can use to call functions 
 
   @override
   Future<void> initialize() => provider.initialize();
