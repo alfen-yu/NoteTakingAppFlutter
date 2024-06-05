@@ -53,6 +53,23 @@ void main() {
 
       expect(user.isEmailVerified, false);
     });
+
+    // email verification test
+    test('Logged in user should be able to get verified', () {
+      provider.sendEmailVerification();
+      final user = provider.currentUser;
+      expect(user, isNotNull);
+      expect(user!.isEmailVerified, true); // forcefully unwrapped
+    });
+
+    // logout test
+    test('Should be able to logout and login again', () async {
+      await provider.logout(); // logouts first then logs in 
+      await provider.login(email: 'email', password: 'password');
+
+      final user = provider.currentUser; // checks if the user is able to login again 
+      expect(user, isNotNull); // user shouldn't be null if it has logged in again 
+    });
   });
 }
 
@@ -77,7 +94,7 @@ class MockAuthProvider implements AuthProvider {
 
   @override
   Future<void> initialize() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
     _isInitialized = true;
   }
 
