@@ -1,4 +1,4 @@
-# Basic Notes App
+# Basic Note Taking App
 Learning Flutter App Development in the summers, first app. 
 
 
