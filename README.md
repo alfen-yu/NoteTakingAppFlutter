@@ -1,8 +1,8 @@
-# test-flutter-app
+# Basic Notes App
 Learning Flutter App Development in the summers, first app. 
 
 
-following tutorial: 
+Following tutorial: 
 ## Flutter Course for Beginners – 37-hour Cross Platform App Development Tutorial by freeCodeCamp
 https://www.youtube.com/watch?v=VPvVD8t02U8
 
