@@ -1,6 +1,6 @@
-import 'package:dartbasics/services/auth_exceptions.dart';
-import 'package:dartbasics/services/auth_provider.dart';
-import 'package:dartbasics/services/auth_user.dart';
+import 'package:dartbasics/services/auth/auth_exceptions.dart';
+import 'package:dartbasics/services/auth/auth_provider.dart';
+import 'package:dartbasics/services/auth/auth_user.dart';
 import 'package:test/test.dart';
 
 // mock function tests the functionality of a function like a spy, we implement all the functionalities that the original function implements but with special logic which

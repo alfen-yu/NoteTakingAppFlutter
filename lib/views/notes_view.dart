@@ -1,6 +1,6 @@
 import 'package:dartbasics/constants/routes.dart';
 import 'package:dartbasics/enums/menu_action.dart';
-import 'package:dartbasics/services/auth_service.dart';
+import 'package:dartbasics/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 

@@ -1,7 +1,7 @@
 import 'package:dartbasics/firebase_options.dart';
-import 'package:dartbasics/services/auth_user.dart';
-import 'package:dartbasics/services/auth_provider.dart';
-import 'package:dartbasics/services/auth_exceptions.dart';
+import 'package:dartbasics/services/auth/auth_user.dart';
+import 'package:dartbasics/services/auth/auth_provider.dart';
+import 'package:dartbasics/services/auth/auth_exceptions.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
 import 'package:firebase_core/firebase_core.dart';

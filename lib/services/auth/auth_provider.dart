@@ -1,4 +1,4 @@
-import 'package:dartbasics/services/auth_user.dart';
+import 'package:dartbasics/services/auth/auth_user.dart';
 
 // abstract class inmplemented by firebase auth provider, auth service
 // can also be implemented for other authentication services

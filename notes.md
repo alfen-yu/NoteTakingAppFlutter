@@ -11,12 +11,17 @@ expectations.
 
 2.  Dev Development aren't added when the app is shipped and released, they are only in the development mode. 
 
+3. __Path Provider__ allows us to retrieve the path from the sandboxes of mobile phones that are at the kernel-level. __Path__ provides us to utilize and work with those paths. 
+
 ## Practical
 
 1. If the UI gets stuck on a white screen or not running properly. 
     - ```flutter clean```
     - ```flutter run --debug``` 
 
+2. If you want some specific function from a library we can use the show command ```import 'package:xxx/xxx.dart show abc'```
+
 ## Commands
 
 1. ```flutter pub add test --dev``` // to add tests to your flutter application 
+2. ```flutter pub add xxx``` for adding a new package

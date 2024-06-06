@@ -1,5 +1,5 @@
 import 'package:dartbasics/constants/routes.dart';
-import 'package:dartbasics/services/auth_service.dart';
+import 'package:dartbasics/services/auth/auth_service.dart';
 import 'package:dartbasics/views/login_view.dart';
 import 'package:dartbasics/views/notes_view.dart';
 import 'package:dartbasics/views/register_view.dart';

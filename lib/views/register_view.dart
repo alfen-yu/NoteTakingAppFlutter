@@ -1,6 +1,6 @@
 import 'package:dartbasics/constants/routes.dart';
-import 'package:dartbasics/services/auth_exceptions.dart';
-import 'package:dartbasics/services/auth_service.dart';
+import 'package:dartbasics/services/auth/auth_exceptions.dart';
+import 'package:dartbasics/services/auth/auth_service.dart';
 import 'package:dartbasics/utilities/errors.dart';
 import 'package:flutter/material.dart';
 

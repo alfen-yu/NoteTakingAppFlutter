@@ -1,6 +1,6 @@
-import 'package:dartbasics/services/auth_user.dart';
-import 'package:dartbasics/services/auth_provider.dart';
-import 'package:dartbasics/services/firebase_auth_provider.dart';
+import 'package:dartbasics/services/auth/auth_user.dart';
+import 'package:dartbasics/services/auth/auth_provider.dart';
+import 'package:dartbasics/services/auth/firebase_auth_provider.dart';
 
 // auth service also implements auth provider, it takes an instance of auth provider as well
 // auth service is just the provider itself exposing the functionality we give it
