@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartbasics/services/crud/crud_exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -23,6 +25,98 @@ class NotesService {
     final uid = await db.insert(userTable, {emailColumn: email.toLowerCase()});
 
     return DatabaseUser(id: uid, email: email);
+  }
+
+  // get user
+  Future<DatabaseUser> getUser({required String email}) async {
+    final db = _getDatabase();
+
+    final results = await db.query(userTable,
+        limit: 1, where: 'email = ?', whereArgs: [email.toLowerCase()]);
+
+    if (results.isEmpty) {
+      throw CouldNotFindUser();
+    } else {
+      return DatabaseUser.fromRow(results
+          .first); // first row that was read from the user tables after checking the email address
+    }
+  }
+
+  Future<DatabaseNote> updateNote(
+      {required DatabaseNote note, required String text}) async {
+    final db = _getDatabase();
+    await fetchNote(id: note.id);
+
+    final updatesCount = await db.update(noteTable, {
+      textColumn: text,
+      isSyncedColumn: 0,
+    });
+
+    if (updatesCount == 0) {
+      throw CouldNotUpdateNote();
+    } else {
+      return await fetchNote(id: note.id);
+    }
+  }
+
+  Future<Iterable<DatabaseNote>> fetchAllNotes() async {
+    final db = _getDatabase();
+    final notes = await db.query(noteTable);
+
+    return notes.map((noteRow) => DatabaseNote.fromRow(noteRow));
+  }
+
+  // fetches a single notes based on id
+  Future<DatabaseNote> fetchNote({required int id}) async {
+    final db = _getDatabase();
+    final notes =
+        await db.query(noteTable, limit: 1, where: 'id = ?', whereArgs: [id]);
+
+    if (notes.isEmpty) {
+      throw CouldNotFindNote();
+    } else {
+      return DatabaseNote.fromRow(notes.first);
+    }
+  }
+
+  // delete all the notes
+  Future<int> deleteAllNotes() async {
+    final db = _getDatabase();
+    return await db.delete(noteTable);
+  }
+
+  // function to delete notes
+  Future<void> deleteNote({required int id}) async {
+    final db = _getDatabase();
+    final deletedCount =
+        await db.delete(noteTable, where: 'id = ?', whereArgs: [id]);
+
+    if (deletedCount == 0) {
+      throw CouldNotDeleteNote();
+    }
+  }
+
+  Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
+    final db = _getDatabase();
+    final dbUser = await getUser(email: owner.email);
+
+    // make sure owner exists in the database with the correct id
+    if (dbUser != owner) {
+      throw CouldNotFindUser();
+    }
+
+    const text = '';
+    // create the note
+    final noteID = await db.insert(noteTable, {
+      uidColumn: owner.id,
+      textColumn: text,
+      isSyncedColumn: 1,
+    });
+
+    final note =
+        DatabaseNote(id: noteID, uid: owner.id, text: text, isSynced: true);
+
+    return note;
   }
 
   // get database or throw and exception
