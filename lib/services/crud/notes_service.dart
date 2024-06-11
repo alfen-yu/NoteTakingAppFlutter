@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:dartbasics/services/crud/crud_exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -9,7 +8,33 @@ import 'package:path/path.dart' show join;
 // a crud service that works with our database
 class NotesService {
   // database from the sqlite library
-  Database? _db; // private variable
+
+  // variables with an _ are private variables and need a getter to access them
+  Database? _db;
+  List<DatabaseNote> _notes = []; // when the list changes we need to tell the UI that something is changed
+
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUser {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // control a stream of a list of database notes
+  // broadcast is used to detect changes multiple times
+  final _notesStreamController =
+      StreamController<List<DatabaseNote>>.broadcast();
+
+  Future<void> _cacheNotes() async {
+    final allNotes = await fetchAllNotes();
+    _notes = allNotes.toList();
+    _notesStreamController.add(_notes);
+  }
 
   Future<DatabaseUser> createUser({required String email}) async {
     final db = _getDatabase();
@@ -42,10 +67,13 @@ class NotesService {
     }
   }
 
-  Future<DatabaseNote> updateNote(
-      {required DatabaseNote note, required String text}) async {
+  Future<DatabaseNote> updateNote({required DatabaseNote note, required String text}) async {
     final db = _getDatabase();
+
+    // make sure the note exists
     await fetchNote(id: note.id);
+
+
 
     final updatesCount = await db.update(noteTable, {
       textColumn: text,
@@ -55,7 +83,11 @@ class NotesService {
     if (updatesCount == 0) {
       throw CouldNotUpdateNote();
     } else {
-      return await fetchNote(id: note.id);
+      final updatedNote =  await fetchNote(id: note.id);
+      _notes.removeWhere((note) => note.id == updatedNote.id);
+      _notes.add(updatedNote);
+      _notesStreamController.add(_notes);
+      return updatedNote;
     }
   }
 
@@ -66,7 +98,7 @@ class NotesService {
     return notes.map((noteRow) => DatabaseNote.fromRow(noteRow));
   }
 
-  // fetches a single notes based on id
+  // fetches a single note based on id
   Future<DatabaseNote> fetchNote({required int id}) async {
     final db = _getDatabase();
     final notes =
@@ -74,15 +106,22 @@ class NotesService {
 
     if (notes.isEmpty) {
       throw CouldNotFindNote();
-    } else {
-      return DatabaseNote.fromRow(notes.first);
+    } else { 
+      final note =  DatabaseNote.fromRow(notes.first);
+      _notes.removeWhere((note) => note.id == id);
+      _notes.add(note);
+      _notesStreamController.add(_notes);
+      return note; 
     }
   }
 
   // delete all the notes
   Future<int> deleteAllNotes() async {
     final db = _getDatabase();
-    return await db.delete(noteTable);
+    final numberOfDeletions =  await db.delete(noteTable);
+    _notes = [];
+    _notesStreamController.add(_notes);
+    return numberOfDeletions;
   }
 
   // function to delete notes
@@ -93,6 +132,12 @@ class NotesService {
 
     if (deletedCount == 0) {
       throw CouldNotDeleteNote();
+    } else {
+      final count = _notes.length;
+      _notes.removeWhere((note) => note.id == id);
+      if (_notes.length != count) {
+        _notesStreamController.add(_notes);
+      }
     }
   }
 
@@ -115,6 +160,9 @@ class NotesService {
 
     final note =
         DatabaseNote(id: noteID, uid: owner.id, text: text, isSynced: true);
+
+    _notes.add(note);
+    _notesStreamController.add(_notes);
 
     return note;
   }
@@ -159,6 +207,7 @@ class NotesService {
       // creation of the tables
       await db.execute(createUserTable);
       await db.execute(createNoteTable);
+      await _cacheNotes(); // read all the notes inside the list and the stream
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
     }

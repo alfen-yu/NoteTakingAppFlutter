@@ -17,7 +17,7 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: const Text('Tasking App'),
+            title: const Text('Notes App'),
             backgroundColor: const Color.fromARGB(255, 67, 196, 166),
             foregroundColor: const Color.fromARGB(255, 117, 32, 2),
             actions: [

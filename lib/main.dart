@@ -12,7 +12,7 @@ void main() async {
       .ensureInitialized(); // Initializes everything at the start
 
   runApp(MaterialApp(
-    title: 'Flutter Start',
+    title: 'Notes App',
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.redAccent),
       useMaterial3: true,
