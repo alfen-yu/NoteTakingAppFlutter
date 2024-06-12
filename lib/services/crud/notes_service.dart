@@ -7,6 +7,12 @@ import 'package:path/path.dart' show join;
 
 // a crud service that works with our database
 class NotesService {
+
+  static final NotesService _shared = NotesService._sharedInstance(); // private initializer of this class
+  NotesService._sharedInstance(); 
+  // creation of a singleton 
+  factory NotesService() => _shared;
+
   // database from the sqlite library
 
   // variables with an _ are private variables and need a getter to access them
@@ -27,8 +33,10 @@ class NotesService {
 
   // control a stream of a list of database notes
   // broadcast is used to detect changes multiple times
-  final _notesStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  final _notesStreamController = StreamController<List<DatabaseNote>>.broadcast();
+
+  // getter for getting all the notes 
+  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
 
   Future<void> _cacheNotes() async {
     final allNotes = await fetchAllNotes();
@@ -37,6 +45,7 @@ class NotesService {
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
+    await _isDbOpen();
     final db = _getDatabase();
     // checking if the user with the same email even exists
     final results = await db.query(userTable,
@@ -54,6 +63,7 @@ class NotesService {
 
   // get user
   Future<DatabaseUser> getUser({required String email}) async {
+    await _isDbOpen();
     final db = _getDatabase();
 
     final results = await db.query(userTable,
@@ -68,6 +78,7 @@ class NotesService {
   }
 
   Future<DatabaseNote> updateNote({required DatabaseNote note, required String text}) async {
+    await _isDbOpen();
     final db = _getDatabase();
 
     // make sure the note exists
@@ -92,6 +103,7 @@ class NotesService {
   }
 
   Future<Iterable<DatabaseNote>> fetchAllNotes() async {
+    await _isDbOpen();
     final db = _getDatabase();
     final notes = await db.query(noteTable);
 
@@ -100,6 +112,7 @@ class NotesService {
 
   // fetches a single note based on id
   Future<DatabaseNote> fetchNote({required int id}) async {
+    await _isDbOpen();
     final db = _getDatabase();
     final notes =
         await db.query(noteTable, limit: 1, where: 'id = ?', whereArgs: [id]);
@@ -117,6 +130,7 @@ class NotesService {
 
   // delete all the notes
   Future<int> deleteAllNotes() async {
+    await _isDbOpen();
     final db = _getDatabase();
     final numberOfDeletions =  await db.delete(noteTable);
     _notes = [];
@@ -126,6 +140,7 @@ class NotesService {
 
   // function to delete notes
   Future<void> deleteNote({required int id}) async {
+    await _isDbOpen();
     final db = _getDatabase();
     final deletedCount =
         await db.delete(noteTable, where: 'id = ?', whereArgs: [id]);
@@ -142,6 +157,7 @@ class NotesService {
   }
 
   Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
+    await _isDbOpen();
     final db = _getDatabase();
     final dbUser = await getUser(email: owner.email);
 
@@ -179,6 +195,7 @@ class NotesService {
 
   // deletes the user from the table
   Future<void> deleteUser({required String email}) async {
+    await _isDbOpen();
     final db = _getDatabase();
     final deletedCount = await db.delete(userTable,
         where: 'email = ?', whereArgs: [email.toLowerCase()]);
@@ -186,6 +203,14 @@ class NotesService {
     // throws an error if it is called on a non-existing email
     if (deletedCount != 1) {
       throw CouldNotDeleteUser();
+    }
+  }
+
+  Future<void> _isDbOpen() async {
+    try {
+      await open();
+    } on DatabaseAlreadyOpenException {
+      // empty pass
     }
   }
 

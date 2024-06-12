@@ -13,6 +13,8 @@ expectations.
 
 3. __Path Provider__ allows us to retrieve the path from the sandboxes of mobile phones that are at the kernel-level. __Path__ provides us to utilize and work with those paths. 
 
+4. __Factory Constructor:__ The reason of using a factory constructor is that, it is the same as a normal constructor but you can return something using a factory constructor, moreover, we can put a conditional statement on a factory constructor. 
+
 ## Practical
 
 1. If the UI gets stuck on a white screen or not running properly. 

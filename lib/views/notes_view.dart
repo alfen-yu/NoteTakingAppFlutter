@@ -1,6 +1,7 @@
 import 'package:dartbasics/constants/routes.dart';
 import 'package:dartbasics/enums/menu_action.dart';
 import 'package:dartbasics/services/auth/auth_service.dart';
+import 'package:dartbasics/services/crud/notes_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
@@ -13,6 +14,23 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesViewState extends State<NotesView> {
+
+  late final NotesService _notesService;
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+  @override 
+  // we want to have a notes service in our init state 
+  void initState() {
+    _notesService = NotesService();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notesService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +51,7 @@ class _NotesViewState extends State<NotesView> {
                 }
               default:
                 devtools.log(
-                    'nothing is going to happen, dont worry, you should be happy ::3)');
+                    'nothing is going to happen, dont worry, you should be happy :3)');
             }
           }, itemBuilder: (context) {
             return const [
@@ -41,7 +59,33 @@ class _NotesViewState extends State<NotesView> {
                   value: MenuAction.logout, child: Text('Logout'))
             ];
           }),
-        ]));
+        ]),
+        body: FutureBuilder(
+          // the future builder checks for the user if it exists, then a stream of all notes is returned if a user is there
+          future: _notesService.getOrCreateUser(email: userEmail),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                return StreamBuilder(stream: _notesService.allNotes, builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return const Text('Waiting for all notes...');
+                    default:
+                      return const CircularProgressIndicator();
+                  }
+                });
+              case ConnectionState.none:
+                return const Text('None');
+              case ConnectionState.waiting:
+                return const Text('Waiting');
+              case ConnectionState.active:
+                return const Text('Active');
+              default: 
+                return const CircularProgressIndicator();
+            }
+          },
+        ),
+        );
   }
 }
 
