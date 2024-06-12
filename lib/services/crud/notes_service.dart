@@ -8,15 +8,15 @@ import 'package:path/path.dart' show join;
 // a crud service that works with our database
 class NotesService {
 
+  // variables with an _ are private variables and need a getter to access them
+  Database? _db;
+
   static final NotesService _shared = NotesService._sharedInstance(); // private initializer of this class
   NotesService._sharedInstance(); 
   // creation of a singleton 
   factory NotesService() => _shared;
 
   // database from the sqlite library
-
-  // variables with an _ are private variables and need a getter to access them
-  Database? _db;
   List<DatabaseNote> _notes = []; // when the list changes we need to tell the UI that something is changed
 
   Future<DatabaseUser> getOrCreateUser({required String email}) async {
@@ -306,23 +306,21 @@ const noteTable = 'note';
 const userTable = 'user';
 const idColumn = 'id';
 const emailColumn = 'email';
-const uidColumn = 'user_id';
+const uidColumn = 'uid';
 const textColumn = 'text';
 const isSyncedColumn = 'is_synced';
 
-// creates the user table too if the db didn't exist initially
-const createUserTable = '''CREATE TABLE "User" IF NOT EXISTS (
-	"id"	INTEGER NOT NULL,
-	"email"	TEXT NOT NULL UNIQUE,
-	PRIMARY KEY("id" AUTOINCREMENT)
+// creates the user and note table if the db didn't exist initially
+const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "email" TEXT NOT NULL UNIQUE
 );''';
 
 // creates the note table too if the db didn't exist initially
-const createNoteTable = '''CREATE TABLE "Note" IF NOT EXISTS (
-	"id"	INTEGER NOT NULL,
-	"uid"	INTEGER NOT NULL,
-	"text"	TEXT,
-	"is_synced"	INTEGER NOT NULL DEFAULT 0,
-	FOREIGN KEY("uid") REFERENCES "User"("id"),
-	PRIMARY KEY("id" AUTOINCREMENT)
+const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "uid" INTEGER NOT NULL,
+    "text" TEXT,
+    "is_synced" INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY("uid") REFERENCES "user"("id")
 );''';
