@@ -12,7 +12,11 @@ class NotesService {
   Database? _db;
 
   static final NotesService _shared = NotesService._sharedInstance(); // private initializer of this class
-  NotesService._sharedInstance(); 
+  NotesService._sharedInstance() {
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(onListen: () {
+      _notesStreamController.sink.add(_notes);
+    });
+    }
   // creation of a singleton 
   factory NotesService() => _shared;
 
@@ -33,7 +37,7 @@ class NotesService {
 
   // control a stream of a list of database notes
   // broadcast is used to detect changes multiple times
-  final _notesStreamController = StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   // getter for getting all the notes 
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
