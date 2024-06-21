@@ -13,7 +13,7 @@ void main() async {
       .ensureInitialized(); // Initializes everything at the start
 
   runApp(MaterialApp(
-    title: 'Time Trader Homepage',
+    title: 'Notes App',
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.redAccent),
       useMaterial3: true,
