@@ -1,15 +1,17 @@
 import 'package:dartbasics/services/auth/auth_service.dart';
 import 'package:dartbasics/services/crud/notes_service.dart';
+import 'package:dartbasics/utilities/generics/get_arguments.dart';
 import 'package:flutter/material.dart';
 
-class NewNoteView extends StatefulWidget {
-  const NewNoteView({super.key});
+// CU stands for Create, Read, & Update
+class CRUNoteView extends StatefulWidget {
+  const CRUNoteView({super.key});
 
   @override
-  State<NewNoteView> createState() => _NewNoteViewState();
+  State<CRUNoteView> createState() => _CRUNoteViewState();
 }
 
-class _NewNoteViewState extends State<NewNoteView> {
+class _CRUNoteViewState extends State<CRUNoteView> {
 
   // PRIVATE VARIABLES AND FUNCTIONS DEFINED HERE 
 
@@ -68,7 +70,15 @@ class _NewNoteViewState extends State<NewNoteView> {
   // PRIVATE VARIABLES AND FUNCTIONS END 
 
   // checks if the note already exists otherwise create the note 
-  Future<DatabaseNote> createNewNote() async {
+  Future<DatabaseNote> createReadUpdateNote(BuildContext context) async {
+    final widgetNote = context.getArgument<DatabaseNote>(); // need to indicate which argument type we want to extract 
+    if (widgetNote != null) { // it checks if the widgetnote already has something written in it if it has then it sets our text field to the existing note 
+      _note = widgetNote; // we saved it to our note 
+      // text field should be pre populated with the existing text 
+      _textController.text = widgetNote.text; // giving the already written text to the text controller field 
+      return widgetNote; 
+    }
+
     final existingNote = _note; 
     if (existingNote != null) {
       return existingNote;
@@ -78,7 +88,9 @@ class _NewNoteViewState extends State<NewNoteView> {
     final currentUser = AuthService.firebase().currentUser!;
     final email = currentUser.email!;
     final owner = await _notesService.getUser(email: email);
-    return await _notesService.createNote(owner: owner);
+    final newNote =  await _notesService.createNote(owner: owner);
+    _note = newNote; 
+    return newNote; 
     }
 
 
@@ -96,11 +108,10 @@ class _NewNoteViewState extends State<NewNoteView> {
     return Scaffold(
       appBar: AppBar(title: const Text('Create a Note'),),
       body: FutureBuilder(
-        future: createNewNote(),
+        future: createReadUpdateNote(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              _note = snapshot.data as DatabaseNote;
               _setupListener(); // starts listening for user text changes 
               return TextField(
                 // our text field will expand if text increases 

@@ -1,7 +1,7 @@
 import 'package:dartbasics/constants/routes.dart';
 import 'package:dartbasics/services/auth/auth_service.dart';
 import 'package:dartbasics/views/login_view.dart';
-import 'package:dartbasics/views/notes/new_note.dart';
+import 'package:dartbasics/views/notes/cru_note_view.dart';
 import 'package:dartbasics/views/notes/notes_view.dart';
 import 'package:dartbasics/views/register_view.dart';
 import 'package:dartbasics/views/verify_email_view.dart';
@@ -24,7 +24,7 @@ void main() async {
       registerRoute: (context) => const RegisterView(),
       notesRoute: (context) => const NotesView(),
       verifyEmail: (context) => const VerifyEmailView(),
-      newNoteRoute: (context) => const NewNoteView(),
+      cruNoteRoute: (context) => const CRUNoteView(), // create, read, or update note route 
     },
   ));
 }
