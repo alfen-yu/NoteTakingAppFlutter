@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dartbasics/extensions/list/filter.dart';
 import 'package:dartbasics/services/crud/crud_exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,6 +11,8 @@ class NotesService {
 
   // variables with an _ are private variables and need a getter to access them
   Database? _db;
+
+  DatabaseUser? _user; 
 
   static final NotesService _shared = NotesService._sharedInstance(); // private initializer of this class
   NotesService._sharedInstance() {
@@ -23,12 +26,23 @@ class NotesService {
   // database from the sqlite library
   List<DatabaseNote> _notes = []; // when the list changes we need to tell the UI that something is changed
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({required String email, bool setAsCurrentUser = true}) async {
     try {
       final user = await getUser(email: email);
+
+      // if we retrieved a user from the database and bool is true then we set our user = user 
+      if (setAsCurrentUser) {
+        _user = user; 
+      }
+
       return user;
     } on CouldNotFindUser {
       final createdUser = await createUser(email: email);
+
+      // if we have just created a user we will set our user equal to the created user as well 
+      if (setAsCurrentUser) {
+        _user = createdUser;
+      }
       return createdUser;
     } catch (e) {
       rethrow;
@@ -38,9 +52,18 @@ class NotesService {
   // control a stream of a list of database notes
   // broadcast is used to detect changes multiple times
   late final StreamController<List<DatabaseNote>> _notesStreamController;
+  
+  // we need to filter the database notes relevant to the user/ created by the user logged in 
 
   // getter for getting all the notes 
-  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
+  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream.filter((note) {
+    final currentUser = _user; 
+    if (currentUser != null) {
+      return note.uid == currentUser.id;
+    } else { 
+      throw UserShouldBeSetBeforeReadingAllNotes();
+    }
+  });
 
   Future<void> _cacheNotes() async {
     final allNotes = await fetchAllNotes();
@@ -88,12 +111,10 @@ class NotesService {
     // make sure the note exists
     await fetchNote(id: note.id);
 
-
-
     final updatesCount = await db.update(noteTable, {
       textColumn: text,
       isSyncedColumn: 0,
-    });
+    }, where: 'id = ?', whereArgs: [note.id]);
 
     if (updatesCount == 0) {
       throw CouldNotUpdateNote();
