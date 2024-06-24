@@ -86,7 +86,7 @@ class _CRUNoteViewState extends State<CRUNoteView> {
 
     // create note function takes a user (owner) therefore, we need to define a user and its email first 
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email!;
+    final email = currentUser.email;
     final owner = await _notesService.getUser(email: email);
     final newNote =  await _notesService.createNote(owner: owner);
     _note = newNote; 
