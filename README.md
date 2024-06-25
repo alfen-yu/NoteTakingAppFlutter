@@ -1,6 +1,15 @@
-# Basic Note Taking App
-Learning Flutter App Development in the summers, first app. 
+# Note Taking App
+Learning Flutter App Development properly now, this is the first flutter app that I have created. 
 
+Contains: 
+    - Login 
+    - Signup 
+    - Email Verification 
+    - Firestore Storage 
+    - Firebase Authentication 
+    - CRUD Functionality 
+    - Persistent Data
+    - Error Handling 
 
 Following tutorial: 
 ## Flutter Course for Beginners – 37-hour Cross Platform App Development Tutorial by freeCodeCamp
