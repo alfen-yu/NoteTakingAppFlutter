@@ -1,7 +1,8 @@
 import 'package:dartbasics/services/auth/auth_service.dart';
-import 'package:dartbasics/services/crud/notes_service.dart';
 import 'package:dartbasics/utilities/generics/get_arguments.dart';
 import 'package:flutter/material.dart';
+import 'package:dartbasics/services/cloud/firebase_cloud_storage.dart';
+import 'package:dartbasics/services/cloud/cloud_note.dart';
 
 // CU stands for Create, Read, & Update
 class CRUNoteView extends StatefulWidget {
@@ -15,15 +16,15 @@ class _CRUNoteViewState extends State<CRUNoteView> {
 
   // PRIVATE VARIABLES AND FUNCTIONS DEFINED HERE 
 
-  DatabaseNote? _note; // optional private variable for the new note
-  late final NotesService _notesService;
+  CloudNote? _note; // optional private variable for the new note
+  late final FirebaseCloudStorage _notesService;
 
   // a text field that will vertically expand and shrink, also keep track of the text user enters and synced with firebase and database. 
   late final TextEditingController _textController; 
 
   @override 
   void initState() {
-    _notesService = NotesService();
+    _notesService = FirebaseCloudStorage();
     _textController = TextEditingController();
     super.initState();
   }
@@ -33,7 +34,7 @@ class _CRUNoteViewState extends State<CRUNoteView> {
   void _deleteEmptyNote() {
     final note = _note;
     if (_textController.text.isEmpty && note != null) {
-      _notesService.deleteNote(id: note.id);
+      _notesService.deleteNote(documentId: note.documentId);
     }
   }
 
@@ -43,7 +44,7 @@ class _CRUNoteViewState extends State<CRUNoteView> {
     final text = _textController.text;
 
     if (note != null && text.isNotEmpty) {
-      await _notesService.updateNote(note: note, text: text);
+      await _notesService.updateNote(documentId: note.documentId, text: text);
     }
   }
 
@@ -56,7 +57,7 @@ class _CRUNoteViewState extends State<CRUNoteView> {
       return;
     } else {
       final text = _textController.text;
-      await _notesService.updateNote(note: note, text: text);
+      await _notesService.updateNote(documentId: note.documentId, text: text);
     }
   }
 
@@ -70,8 +71,8 @@ class _CRUNoteViewState extends State<CRUNoteView> {
   // PRIVATE VARIABLES AND FUNCTIONS END 
 
   // checks if the note already exists otherwise create the note 
-  Future<DatabaseNote> createReadUpdateNote(BuildContext context) async {
-    final widgetNote = context.getArgument<DatabaseNote>(); // need to indicate which argument type we want to extract 
+  Future<CloudNote> createReadUpdateNote(BuildContext context) async {
+    final widgetNote = context.getArgument<CloudNote>(); // need to indicate which argument type we want to extract 
     if (widgetNote != null) { // it checks if the widgetnote already has something written in it if it has then it sets our text field to the existing note 
       _note = widgetNote; // we saved it to our note 
       // text field should be pre populated with the existing text 
@@ -86,9 +87,8 @@ class _CRUNoteViewState extends State<CRUNoteView> {
 
     // create note function takes a user (owner) therefore, we need to define a user and its email first 
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email;
-    final owner = await _notesService.getUser(email: email);
-    final newNote =  await _notesService.createNote(owner: owner);
+    final uid = currentUser.id;
+    final newNote =  await _notesService.createNewNote(ownerUserId: uid);
     _note = newNote; 
     return newNote; 
     }
