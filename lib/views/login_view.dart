@@ -1,8 +1,10 @@
 import 'package:dartbasics/constants/routes.dart';
 import 'package:dartbasics/services/auth/auth_exceptions.dart';
-import 'package:dartbasics/services/auth/auth_service.dart';
+import 'package:dartbasics/services/auth/bloc/auth_bloc.dart';
+import 'package:dartbasics/services/auth/bloc/auth_event.dart';
 import 'package:dartbasics/utilities/dialogs/error_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -61,25 +63,28 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await AuthService.firebase()
-                    .login(email: email, password: password);
-                final user = AuthService.firebase().currentUser;
-                if (user?.isEmailVerified == true) {
-                  if (!context.mounted) return;
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
-                    (route) => false,
-                  );
-                } else {
-                  if (!context.mounted) return;
-                  await showErrorDialog(
-                      context, 'Please verify your email first.');
-                  if (!context.mounted) return;
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    verifyEmail,
-                    (route) => false,
-                  );
-                }
+                // await AuthService.firebase()
+                //     .login(email: email, password: password);
+                // final user = AuthService.firebase().currentUser;
+                // if (user?.isEmailVerified == true) {
+                //   if (!context.mounted) return;
+                //   Navigator.of(context).pushNamedAndRemoveUntil(
+                //     notesRoute,
+                //     (route) => false,
+                //   );
+                // } else {
+                //   if (!context.mounted) return;
+                //   await showErrorDialog(
+                //       context, 'Please verify your email first.');
+                //   if (!context.mounted) return;
+                //   Navigator.of(context).pushNamedAndRemoveUntil(
+                //     verifyEmail,
+                //     (route) => false,
+                //   );
+                // }
+                context.read<AuthBloc>().add(
+                  AuthEventLogIn(email, password)
+                );
               }
               // using the auth services
               on UserNotFoundAuthException {

@@ -1,12 +1,15 @@
 import 'package:dartbasics/constants/routes.dart';
 import 'package:dartbasics/enums/menu_action.dart';
 import 'package:dartbasics/services/auth/auth_service.dart';
+import 'package:dartbasics/services/auth/bloc/auth_bloc.dart';
+import 'package:dartbasics/services/auth/bloc/auth_event.dart';
 import 'package:dartbasics/services/cloud/cloud_note.dart';
 import 'package:dartbasics/services/cloud/firebase_cloud_storage.dart';
 import 'package:dartbasics/utilities/dialogs/generic_dialog.dart';
 import 'package:dartbasics/views/notes/notes_list_view.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -58,10 +61,15 @@ class _NotesViewState extends State<NotesView> {
                       content: 'Are you sure you want to logout?',
                       optionsBuilder: () => {'OK': true, 'Cancel': false});
                   if (logoutResult) {
-                    await AuthService.firebase().logout();
-                    if (!context.mounted) return;
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(loginRoute, (_) => false);
+                    // await AuthService.firebase().logout();
+                    if (!context.mounted) return; 
+                    context.read<AuthBloc>().add(
+                      const AuthEventLogOut()
+                    );
+
+                    // if (!context.mounted) return;
+                    // Navigator.of(context)
+                    //     .pushNamedAndRemoveUntil(loginRoute, (_) => false);
                   }
                 default:
                   devtools.log(
