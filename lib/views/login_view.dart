@@ -2,6 +2,7 @@ import 'package:dartbasics/constants/routes.dart';
 import 'package:dartbasics/services/auth/auth_exceptions.dart';
 import 'package:dartbasics/services/auth/bloc/auth_bloc.dart';
 import 'package:dartbasics/services/auth/bloc/auth_event.dart';
+import 'package:dartbasics/services/auth/bloc/auth_state.dart';
 import 'package:dartbasics/utilities/dialogs/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -58,49 +59,29 @@ class _LoginViewState extends State<LoginView> {
                 hintText: 'Enter your password',
                 labelText: 'Password',
               )),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                // await AuthService.firebase()
-                //     .login(email: email, password: password);
-                // final user = AuthService.firebase().currentUser;
-                // if (user?.isEmailVerified == true) {
-                //   if (!context.mounted) return;
-                //   Navigator.of(context).pushNamedAndRemoveUntil(
-                //     notesRoute,
-                //     (route) => false,
-                //   );
-                // } else {
-                //   if (!context.mounted) return;
-                //   await showErrorDialog(
-                //       context, 'Please verify your email first.');
-                //   if (!context.mounted) return;
-                //   Navigator.of(context).pushNamedAndRemoveUntil(
-                //     verifyEmail,
-                //     (route) => false,
-                //   );
-                // }
-                context.read<AuthBloc>().add(
-                  AuthEventLogIn(email, password)
-                );
-              }
-              // using the auth services
-              on UserNotFoundAuthException {
-                await showErrorDialog(context, 'User does not exist.');
-              } on InvalidCredentialsAuthException {
-                await showErrorDialog(
-                    context, 'Invalid credentials, check again');
-              } on InvalidEmailAuthException {
-                await showErrorDialog(context, 'Email Address is invalid!');
-              } on WrongPasswordAuthException {
-                await showErrorDialog(context, 'Wrong Password!');
-              } on GenericAuthException {
-                await showErrorDialog(context, 'An unexpected error occured.');
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) async {
+              if (state is AuthStateLoggedOut) {
+                if (state.exception is UserNotFoundAuthException) {
+                  await showErrorDialog(context, "User Not Found");
+                } else if (state.exception is InvalidCredentialsAuthException) {
+                  await showErrorDialog(context, "Invalid Credentials");
+                } else if (state.exception is InvalidEmailAuthException) {
+                  await showErrorDialog(context, "Invalid Email");
+                } else if (state.exception is GenericAuthException) {
+                  await showErrorDialog(
+                      context, "An error occurred with login");
+                }
               }
             },
-            child: const Text('Login'),
+            child: TextButton(
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+                context.read<AuthBloc>().add(AuthEventLogIn(email, password));
+              },
+              child: const Text('Login'),
+            ),
           ),
           const Text('Not Registered Yet?'),
           TextButton(
